@@ -1,0 +1,1 @@
+obj-$(CONFIG_VIRTIO_TEST) += virtio_test.o
