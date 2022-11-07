@@ -5,3 +5,5 @@
 ### Changed files
 
 - [drivers/net/virtio_test.c](virtio_test.c)
+
+- [net/Kconfig](net-Kconfig)

@@ -1,0 +1,4 @@
+config NETDEV_ADDR_LIST_TEST
+	tristate "Unit tests for device address list"
+	default KUNIT_ALL
+	depends on KUNIT
