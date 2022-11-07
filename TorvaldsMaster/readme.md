@@ -2,9 +2,11 @@
 
 ## KUnit test
 
-### Changed files
+### Commands
 
-- []
+- `./tools/testing/kunit/kunit.py run "virt*"` __-__ run all kunit tests that starts with `virt`
+
+### Changed files
 
 - [drivers/net/Kconfig](drivers-net-Kconfig)
 
