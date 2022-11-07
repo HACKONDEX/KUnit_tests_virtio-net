@@ -1,0 +1,10 @@
+config STACKINIT_KUNIT_TEST
+	tristate "Test level of stack variable initialization" if !KUNIT_ALL_TESTS
+	depends on KUNIT
+	default KUNIT_ALL
+	help
+	  Test if the kernel is zero-initializing stack variables and
+	  padding. Coverage is controlled by compiler flags,
+	  CONFIG_INIT_STACK_ALL_PATTERN, CONFIG_INIT_STACK_ALL_ZERO,
+	  CONFIG_GCC_PLUGIN_STRUCTLEAK, CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF,
+	  or CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL.
