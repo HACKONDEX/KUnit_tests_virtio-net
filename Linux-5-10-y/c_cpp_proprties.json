@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/include/linux",
+                "${workspaceFolder}/arch/x86/include",
+                "${workspaceFolder}/samples/bpf",
+                "${workspaceFolder}/tools/testing/radix-tree",
+                "${workspaceFolder}/tools/testing/radix-tree/linux",
+                "${workspaceFolder}/.kunit/include/generated/"
+            ],
+            "forcedInclude": [
+                "${workspaceFolder}/.kunit/include/generated/autoconf.h",
+                "${workspaceFolder}/samples/bpf/hbm_kern.h"
+            ],
+            "defines": [
+                "__KERNEL__"
+            ],
+            "compilerPath": "/usr/bin/gcc-11",
+            "cStandard": "c11",
+            "intelliSenseMode": "${default}",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}
