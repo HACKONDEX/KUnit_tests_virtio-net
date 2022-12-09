@@ -14,7 +14,7 @@
 
 - [drivers/net/virtio_net.c](virtio_net.c)
 
-- [include/linux/virtio_net.h][virtio_net.h]
+- [include/linux/virtio_net.h](virtio_net.h)
 
 - [drivers/net/virtio_test.c](virtio_test.c)
 
