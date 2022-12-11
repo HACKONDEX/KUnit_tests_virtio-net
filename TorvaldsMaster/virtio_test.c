@@ -2,25 +2,6 @@
 #include <linux/device.h>
 #include <linux/virtio_config.h>
 
-#include <linux/netdevice.h>
-#include <linux/etherdevice.h>
-#include <linux/ethtool.h>
-#include <linux/module.h>
-#include <linux/virtio.h>
-#include <linux/virtio_net.h>
-#include <linux/bpf.h>
-#include <linux/bpf_trace.h>
-#include <linux/scatterlist.h>
-#include <linux/if_vlan.h>
-#include <linux/slab.h>
-#include <linux/cpu.h>
-#include <linux/average.h>
-#include <linux/filter.h>
-#include <linux/kernel.h>
-#include <net/route.h>
-#include <net/xdp.h>
-#include <net/net_failover.h>
-
 #include "../../fs/kernfs/kernfs-internal.h"
 #include "../../drivers/base/base.h"
 
@@ -28,149 +9,6 @@ static void sum_example_test(struct kunit *test)
 {
 	KUNIT_EXPECT_EQ(test, 2, 2);
 }
-
-///// structs
-
-struct virtnet_sq_stats {
-	struct u64_stats_sync syncp;
-	u64 packets;
-	u64 bytes;
-	u64 xdp_tx;
-	u64 xdp_tx_drops;
-	u64 kicks;
-	u64 tx_timeouts;
-};
-
-struct virtnet_rq_stats {
-	struct u64_stats_sync syncp;
-	u64 packets;
-	u64 bytes;
-	u64 drops;
-	u64 xdp_packets;
-	u64 xdp_tx;
-	u64 xdp_redirects;
-	u64 xdp_drops;
-	u64 kicks;
-};
-
-
-/* Internal representation of a send virtqueue */
-struct send_queue {
-	/* Virtqueue associated with this send _queue */
-	struct virtqueue *vq;
-
-	/* TX: fragments + linear part + virtio header */
-	struct scatterlist sg[MAX_SKB_FRAGS + 2];
-
-	/* Name of the send queue: output.$index */
-	char name[40];
-
-	struct virtnet_sq_stats stats;
-
-	struct napi_struct napi;
-};
-
-/* Internal representation of a receive virtqueue */
-struct receive_queue {
-	/* Virtqueue associated with this receive_queue */
-	struct virtqueue *vq;
-
-	struct napi_struct napi;
-
-	struct bpf_prog __rcu *xdp_prog;
-
-	struct virtnet_rq_stats stats;
-
-	/* Chain pages by the private ptr. */
-	struct page *pages;
-
-	/* Average packet length for mergeable receive buffers. */
-	//struct ewma_pkt_len mrg_avg_pkt_len; // replaced (struct ewma_pkt_len)
-	u64 x;
-
-	/* Page frag for packet buffer allocation. */
-	struct page_frag alloc_frag;
-
-	/* RX: fragments + linear part + virtio header */
-	struct scatterlist sg[MAX_SKB_FRAGS + 2];
-
-	/* Min single buffer size for mergeable buffers case. */
-	unsigned int min_buf_len;
-
-	/* Name of this receive queue: input.$index */
-	char name[40];
-
-	struct xdp_rxq_info xdp_rxq;
-};
-
-struct virtnet_info {
-	struct virtio_device *vdev;
-	struct virtqueue *cvq;
-	struct net_device *dev;
-	struct send_queue *sq;
-	struct receive_queue *rq;
-	unsigned int status;
-
-	/* Max # of queue pairs supported by the device */
-	u16 max_queue_pairs;
-
-	/* # of queue pairs currently used by the driver */
-	u16 curr_queue_pairs;
-
-	/* # of XDP queue pairs currently used by the driver */
-	u16 xdp_queue_pairs;
-
-	/* xdp_queue_pairs may be 0, when xdp is already loaded. So add this. */
-	bool xdp_enabled;
-
-	/* I like... big packets and I cannot lie! */
-	bool big_packets;
-
-	/* Host will merge rx buffers for big packets (shake it! shake it!) */
-	bool mergeable_rx_bufs;
-
-	/* Host supports rss and/or hash report */
-	bool has_rss;
-	bool has_rss_hash_report;
-	u8 rss_key_size;
-	u16 rss_indir_table_size;
-	u32 rss_hash_types_supported;
-	u32 rss_hash_types_saved;
-
-	/* Has control virtqueue */
-	bool has_cvq;
-
-	/* Host can handle any s/g split between our header and packet data */
-	bool any_header_sg;
-
-	/* Packet virtio header size */
-	u8 hdr_len;
-
-	/* Work struct for refilling if we run low on memory. */
-	struct delayed_work refill;
-
-	/* Work struct for config space updates */
-	struct work_struct config_work;
-
-	/* Does the affinity hint is set for virtqueues? */
-	bool affinity_hint_set;
-
-	/* CPU hotplug instances for online & dead */
-	struct hlist_node node;
-	struct hlist_node node_dead;
-
-	struct control_buf *ctrl;
-
-	/* Ethtool settings */
-	u8 duplex;
-	u32 speed;
-
-	unsigned long guest_offloads;
-	unsigned long guest_offloads_capable;
-
-	/* failover when STANDBY feature enabled */
-	struct failover *failover;
-};
 
 void klist_get_test(struct klist_node* n) {
 	printk("\nLOG: In virtio_net.c klist_get_test *** FAKE METHOD ***\n");
@@ -346,9 +184,9 @@ static void virnet_probe_test(struct kunit *test)
                                           VIRTIO_NET_F_MTU,
                                           VIRTIO_NET_F_STATUS};
     // struct virtio_driver drv_s = {.feature_table = feature_table};
-    // drv_s.feature_table_size = 16;
+    // drv_s.feature_table_size = sizeof(feature_table);
     struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
-    drv_s.feature_table_size_legacy = 16;
+    drv_s.feature_table_size_legacy = sizeof(feature_table);
     dev_s.dev.driver = &drv_s.driver;
 
 
@@ -368,7 +206,7 @@ static void virnet_probe_test(struct kunit *test)
     // }
 
     // Virtnet probe test
-    err = virtnet_probe_caller(dev);
+    err = virtnet_probe(dev);
     printk("\nLOG: TEST probe finished \n");
     KUNIT_EXPECT_EQ(test, err, 0);
     KUNIT_EXPECT_EQ(test, 0, 0);
