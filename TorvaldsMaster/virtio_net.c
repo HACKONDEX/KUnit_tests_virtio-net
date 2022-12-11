@@ -1,5 +1,3 @@
-int virtnet_probe_caller(struct virtio_device *vdev)
-{
-	return virtnet_probe(vdev);
-}
-EXPORT_SYMBOL_GPL(virtnet_probe_caller);
+#ifdef CONFIG_VIRTIO_TEST
+#include "virtio_test.c"
+#endif
