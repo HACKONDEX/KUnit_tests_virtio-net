@@ -2,12 +2,19 @@
 #include <linux/virtio_config.h>
 
 #include <linux/virtio_ring.h>
+// #include <uapi/linux/virtio_ring.h>
 
 #include "../../fs/kernfs/kernfs-internal.h"
 #include "../../drivers/base/base.h"
 // #include "../../drivers/virtio/virtio_ring.c"
 
 // from virtio_ring.c
+
+struct vring_desc_state_split {
+	void *data;			/* Data for callback. */
+	struct vring_desc *indir_desc;	/* Indirect descriptor, if any. */
+};
+
 struct vring_virtqueue {
 	struct virtqueue vq;
 
