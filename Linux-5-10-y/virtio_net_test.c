@@ -222,12 +222,20 @@ void test_get_1(struct virtio_device *vdev, unsigned offset,
 	ptr[1] = 1;
 }
 
+bool test_notify_1(struct virtqueue *vq) {
+	printk("\nLOG: --- Notify test 1 --- \n");
+	return true;
+}
+
 int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 			struct virtqueue *vqs[], vq_callback_t *callbacks[],
 			const char * const names[], const bool *ctx,
 			struct irq_affinity *desc) 
 {
     struct virtnet_info *vinfo = (struct virtnet_info *)(dev->priv);
+
+	
+	printk("\nLOG: vinfo->cvq: %p\n", vinfo->cvq);
 
 	// Init queues
 	printk("\nLOG: nvqs: %u\n", nvqs);
@@ -248,16 +256,23 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 		} else {
 			vvrq->split.vring.num = 1;
 		}
+		struct vring_virtqueue *vvsq = to_vvq(vinfo->sq[i].vq);
+		if (vvsq->packed_ring) {
+			vvsq->packed.vring.num = 1;
+		} else {
+			vvsq->split.vring.num = 1;
+		}
 	}
 
-    // vinfo->rq[0].vq = vqs[0];
-	// struct vring_virtqueue *vvrq = to_vvq(vinfo->rq[0].vq);
-	// if (vvrq->packed_ring) {
-	// 	vvrq->packed.vring.num = 1;
-	// } else {
-	// 	vvrq->split.vring.num = 1;
-	// }
-    // vinfo->sq[0].vq = vqs[1];
+	struct virtqueue* cvq = vqs[nvqs - 1];
+	struct vring_virtqueue *vvrq = to_vvq(cvq);
+	vvrq->indirect = true;
+	vvrq->use_dma_api = false;
+	vvrq->vq.num_free = 0;
+	vvrq->notify = test_notify_1;
+	vvrq->split.desc_state = kcalloc(1, sizeof(struct vring_desc_state_split), GFP_KERNEL);
+	vvrq->split.vring.desc = kcalloc(1, sizeof(struct vring_desc), GFP_KERNEL);
+	// vvrq->split.vring.num = 1;
 
 
 	// init kobject
@@ -288,6 +303,11 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	return 0;           
 }
 
+void test_reset_1(struct virtio_device *vdev) {
+	// struct virtnet_info *vinfo = (struct virtnet_info *)(vdev->priv);
+	// struct vring_virtqueue *vvrq = to_vvq(vinfo->cvq);
+	// printk("\nLOG %d: awesome num == %d \n", __LINE__, vvrq->split.vring.desc[0].flags);
+}
 // Test 1
 static void virnet_probe_test_1(struct kunit *test)
 {
@@ -300,10 +320,11 @@ static void virnet_probe_test_1(struct kunit *test)
 	.get = test_get_1,
 	.get_status = test_get_status,
 	.set_status = test_set_status,
+	.reset = test_reset_1,
 	.find_vqs = test_find_vqs_1,
     .set_vq_affinity = test_set_vq_affinity,
     .get_shm_region = test_get_shm_region,
-};
+	};
 
 
     struct virtio_device dev_s = {.config = &config_ops, };
@@ -335,7 +356,7 @@ static void virnet_probe_test_1(struct kunit *test)
     drv_s.feature_table_size_legacy = 17;
     dev_s.dev.driver = &drv_s.driver;
 
-	// Set features
+	// Add features
 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MQ);
 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
 
@@ -355,7 +376,7 @@ static void virnet_probe_test_1(struct kunit *test)
     printk("\nLOG: TEST 1 finished \n");
 
     KUNIT_EXPECT_EQ(test, err, 0);
-	KUNIT_EXPECT_EQ(test, -1, 0);
+	// KUNIT_EXPECT_EQ(test, -1, 0);
 }
 
 static void sum_example_test(struct kunit *test)
@@ -365,8 +386,8 @@ static void sum_example_test(struct kunit *test)
 
 static struct kunit_case example_test_cases[] = {
 	KUNIT_CASE(sum_example_test),
-    // KUNIT_CASE(virnet_probe_test_main),
 	KUNIT_CASE(virnet_probe_test_1), // if 3059
+	KUNIT_CASE(virnet_probe_test_main),
 	{}
 };
 
