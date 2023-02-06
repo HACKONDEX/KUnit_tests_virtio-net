@@ -6,6 +6,10 @@
 
 - `./tools/testing/kunit/kunit.py run "virt*"` __-__ run all kunit tests that starts with `virt`
 
+- `./tools/testing/kunit/kunit.py run --arch=x86_64` __-__ run on other architectures using qemu
+
+- `./tools/testing/kunit/kunit.py run --arch=s390 --cross_compile=s390x-linux-gnu` __-__ specify toolchain for compilation
+
 ### Changed files
 
 - [drivers/net/Kconfig](drivers-net-Kconfig)
