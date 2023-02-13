@@ -10,6 +10,8 @@
 
 - `./tools/testing/kunit/kunit.py run --arch=s390 --cross_compile=s390x-linux-gnu` __-__ specify toolchain for compilation
 
+- `scripts/decode_stacktrace.sh .kunit/vmlinux .kunit < .kunit/test.log | tee .kunit/decoded.log | ./tools/testing/kunit/kunit.py parse` __-__ get more detailed, advantage is that stacktrace contains filenames of the functions
+
 ### Configs
 
 - To run kuint tests for `virtio_net` add configuration in file __`linux/drivers/net/Kconfig`__
@@ -41,6 +43,11 @@
 		CONFIG_KASAN_INLINE=y
 		CONFIG_KASAN_GENERIC=y
 		CONFIG_STACKTRACE=y
+
+- Configs for _gdb debugger_
+
+		CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+		CONFIG_DEBUG_KERNEL=y
 
 
 ### Changed files

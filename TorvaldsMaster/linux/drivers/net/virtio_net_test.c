@@ -96,9 +96,7 @@ int test_find_vqs(struct virtio_device *dev, unsigned nvqs,
 			const char * const names[], const bool *ctx,
 			struct irq_affinity *desc) {
     printk("\nLOG:---Find VQS---\n");
-    // return virtnet_test_find_vqs(dev, nvqs, vqs, callbacks, names, ctx, desc);
-    int x = virtnet_test_find_vqs_test(dev, nvqs, vqs, callbacks, names, ctx, desc);
-	return x;
+    return virtnet_test_find_vqs_test(dev, nvqs, vqs, callbacks, names, ctx, desc);
 }
 
 void test_del_vqs(struct virtio_device *vdev) {
@@ -196,7 +194,6 @@ static void virnet_probe_test_main(struct kunit *test)
 
 
     // virtio_device initialization
-    // struct virtio_device *dev = dev_to_virtio(&dev_s.dev);
     struct virtio_device *dev = &dev_s;
     struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
 
@@ -207,13 +204,10 @@ static void virnet_probe_test_main(struct kunit *test)
     printk("\nLOG: TEST main finished \n");
 
     KUNIT_EXPECT_EQ(test, err, 0);
-    KUNIT_EXPECT_EQ(test, 0, 0);
 }
 
 void test_get_1(struct virtio_device *vdev, unsigned offset,
 		    void *buf, unsigned len) {
-    printk("\nLOG:---Get---\n");
-	printk("\nLOG: len: %u\n", len);
 	u8* ptr = buf;
 	ptr[0] = 1;
 	ptr[1] = 1;
@@ -231,11 +225,7 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 {
     struct virtnet_info *vinfo = (struct virtnet_info *)(dev->priv);
 
-	
-	printk("\nLOG: vinfo->cvq: %p\n", vinfo->cvq);
-
 	// Init queues
-	printk("\nLOG: nvqs: %u\n", nvqs);
 	int i, j;
 	for (i = 0; i < nvqs; ++i) {
 		vqs[i] = kcalloc(1, sizeof(struct virtqueue), GFP_KERNEL);
@@ -246,6 +236,13 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	for (i = 0; i < nvqs / 2; ++i) {
 		vinfo->rq[i].vq = vqs[j];
 		vinfo->sq[i].vq = vqs[j + 1];
+		{
+			struct vring_virtqueue* vring_vq = to_vvq(vqs[j]);
+			vring_vq->notify = test_notify_1;
+			vring_vq = to_vvq(vqs[j + 1]);
+			vring_vq->notify = test_notify_1;
+
+		}
 		j += 2;
 		struct vring_virtqueue *vvrq = to_vvq(vinfo->rq[i].vq);
 		if (vvrq->packed_ring) {
@@ -259,6 +256,15 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 		} else {
 			vvsq->split.vring.num = 1;
 		}
+	}
+
+	// Init dev->cvq
+	{
+		vinfo->cvq = kcalloc(1, sizeof(struct virtqueue), GFP_KERNEL);
+		struct virtqueue* cvq = vinfo->cvq;
+		cvq->vdev = dev;
+		struct vring_virtqueue* vring_vq = to_vvq(cvq);
+		vring_vq->notify = test_notify_1;
 	}
 
 	struct virtqueue* cvq = vqs[nvqs - 1];
@@ -284,7 +290,7 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	kn->dir.root->ino_idr.idr_rt.xa_flags = IDR_RT_MARKER;
 	atomic_set(&kn->count, 1);
 
-	// Init kernfs_node flags(-EINVAL otherwise)
+	// Init kernfs_node
 	kn->flags = 17;
 	// Init klist objects
 	init_dev->parent->p = kcalloc(1, sizeof(struct device_private), GFP_KERNEL);
@@ -296,7 +302,6 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	// Init parent name
 	init_dev->parent->init_name = "ParentDevice\0";
 
-	printk("\nLOG: Find VQS finished\n");
 	return 0;           
 }
 
@@ -380,8 +385,8 @@ static void sum_example_test(struct kunit *test)
 
 static struct kunit_case example_test_cases[] = {
 	KUNIT_CASE(sum_example_test),
-    // KUNIT_CASE(virnet_probe_test_main),
-	KUNIT_CASE(virnet_probe_test_1), // if 3059	{}
+	KUNIT_CASE(virnet_probe_test_main),
+	KUNIT_CASE(virnet_probe_test_1), 
 };
 
 static struct kunit_suite example_test_suite = {
