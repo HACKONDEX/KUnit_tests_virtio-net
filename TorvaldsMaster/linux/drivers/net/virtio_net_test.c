@@ -2,6 +2,8 @@
 
 #include <virtio_net_test.h>
 
+struct kunit *global_test;
+
 void klist_get_test(struct klist_node* n) {
 	printk("\nLOG: In virtio_net.c klist_get_test *** FAKE METHOD ***\n");
 }
@@ -17,7 +19,7 @@ int virtnet_test_find_vqs_test(struct virtio_device *dev, unsigned nvqs,
 	printk("\nLOG: nvqs: %u\n", nvqs);
 	int i;
 	for (i = 0; i < nvqs; ++i) {
-		vqs[i] = kcalloc(1, sizeof(struct virtqueue), GFP_KERNEL);
+		vqs[i] = kunit_kzalloc(global_test, sizeof(struct virtqueue), GFP_KERNEL);
 		vqs[i]->vdev = dev;
 	}
 
@@ -36,22 +38,22 @@ int virtnet_test_find_vqs_test(struct virtio_device *dev, unsigned nvqs,
 	// init kobject
 	struct net_device* net_dev = vinfo->dev;
 	struct device* init_dev = &net_dev->dev;
-	struct kernfs_node *kn = kcalloc(1, sizeof(struct kernfs_node), GFP_KERNEL);
+	struct kernfs_node *kn = kunit_kzalloc(global_test, sizeof(struct kernfs_node), GFP_KERNEL);
 
 	init_dev->parent->kobj.sd = kn;
 	kn->parent = NULL;
 	const int KERNFS_ROOT_MEM_SIZE = 120;
-	kn->dir.root = kcalloc(1, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
+	kn->dir.root = kunit_kzalloc(global_test, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
 	kn->dir.root->ino_idr.idr_rt.xa_flags = IDR_RT_MARKER;
 	atomic_set(&kn->count, 1);
 
 	// Init kernfs_node flags(-EINVAL otherwise)
 	kn->flags = 17;
 	// Init klist objects
-	init_dev->parent->p = kcalloc(1, sizeof(struct device_private), GFP_KERNEL);
+	init_dev->parent->p = kunit_kzalloc(global_test, sizeof(struct device_private), GFP_KERNEL);
 	init_dev->parent->p->klist_children.get = klist_get_test;
 	
-	struct klist_node* k_node = kcalloc(1, sizeof(struct klist_node), GFP_KERNEL);
+	struct klist_node* k_node = kunit_kzalloc(global_test, sizeof(struct klist_node), GFP_KERNEL);
 	init_dev->parent->p->klist_children.k_list.prev = &(k_node->n_node);
 
 	// Init parent name
@@ -162,6 +164,7 @@ static const struct virtio_config_ops VIRTIO_TEST_MAIN_CONFIG_OPS = {
 // Test main
 static void virnet_probe_test_main(struct kunit *test)
 {
+    global_test = test;
     int err = 0;
     printk("\n\n\nStart VirtnetProbeTest main\n\n\n");
     // device initialization
@@ -206,6 +209,8 @@ static void virnet_probe_test_main(struct kunit *test)
     KUNIT_EXPECT_EQ(test, err, 0);
 }
 
+///////////////////// Test 1 /////////////////////
+
 void test_get_1(struct virtio_device *vdev, unsigned offset,
 		    void *buf, unsigned len) {
 	u8* ptr = buf;
@@ -228,7 +233,7 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	// Init queues
 	int i, j;
 	for (i = 0; i < nvqs; ++i) {
-		vqs[i] = kcalloc(1, sizeof(struct virtqueue), GFP_KERNEL);
+		vqs[i] = kunit_kzalloc(global_test, sizeof(struct virtqueue), GFP_KERNEL);
 		vqs[i]->vdev = dev;
 	}
 
@@ -260,7 +265,7 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 
 	// Init dev->cvq
 	{
-		vinfo->cvq = kcalloc(1, sizeof(struct virtqueue), GFP_KERNEL);
+		vinfo->cvq = kunit_kzalloc(global_test, sizeof(struct virtqueue), GFP_KERNEL);
 		struct virtqueue* cvq = vinfo->cvq;
 		cvq->vdev = dev;
 		struct vring_virtqueue* vring_vq = to_vvq(cvq);
@@ -273,30 +278,30 @@ int test_find_vqs_1(struct virtio_device *dev, unsigned nvqs,
 	vvrq->use_dma_api = false;
 	vvrq->vq.num_free = 0;
 	vvrq->notify = test_notify_1;
-	vvrq->split.desc_state = kcalloc(1, sizeof(struct vring_desc_state_split), GFP_KERNEL);
-	vvrq->split.vring.desc = kcalloc(1, sizeof(struct vring_desc), GFP_KERNEL);
+	vvrq->split.desc_state = kunit_kzalloc(global_test, sizeof(struct vring_desc_state_split), GFP_KERNEL);
+	vvrq->split.vring.desc = kunit_kzalloc(global_test, sizeof(struct vring_desc), GFP_KERNEL);
 	// vvrq->split.vring.num = 1;
 
 
 	// init kobject
 	struct net_device* net_dev = vinfo->dev;
 	struct device* init_dev = &net_dev->dev;
-	struct kernfs_node *kn = kcalloc(1, sizeof(struct kernfs_node), GFP_KERNEL);
+	struct kernfs_node *kn = kunit_kzalloc(global_test, sizeof(struct kernfs_node), GFP_KERNEL);
 
 	init_dev->parent->kobj.sd = kn;
 	kn->parent = NULL;
 	const int KERNFS_ROOT_MEM_SIZE = 120;
-	kn->dir.root = kcalloc(1, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
+	kn->dir.root = kunit_kzalloc(global_test, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
 	kn->dir.root->ino_idr.idr_rt.xa_flags = IDR_RT_MARKER;
 	atomic_set(&kn->count, 1);
 
 	// Init kernfs_node
 	kn->flags = 17;
 	// Init klist objects
-	init_dev->parent->p = kcalloc(1, sizeof(struct device_private), GFP_KERNEL);
+	init_dev->parent->p = kunit_kzalloc(global_test, sizeof(struct device_private), GFP_KERNEL);
 	init_dev->parent->p->klist_children.get = klist_get_test;
 	
-	struct klist_node* k_node = kcalloc(1, sizeof(struct klist_node), GFP_KERNEL);
+	struct klist_node* k_node = kunit_kzalloc(global_test, sizeof(struct klist_node), GFP_KERNEL);
 	init_dev->parent->p->klist_children.k_list.prev = &(k_node->n_node);
 
 	// Init parent name
@@ -321,8 +326,9 @@ static const struct virtio_config_ops VIRTIO_TEST_1_CONFIG_OPS = {
     .get_shm_region = test_get_shm_region,
 	};
 
-static void virnet_probe_test_1(struct kunit *test)
+static void virtnet_probe_test_1(struct kunit *test)
 {
+    global_test = test;
     printk("\n\n\nStart Test 1\n\n\n");
 
 	// set handler functions
@@ -375,7 +381,255 @@ static void virnet_probe_test_1(struct kunit *test)
     printk("\nLOG: TEST 1 finished \n");
 
     KUNIT_EXPECT_EQ(test, err, 0);
-	// KUNIT_EXPECT_EQ(test, -1, 0);
+}
+
+///////////////////// Test 2 /////////////////////
+
+int test_find_vqs_2(struct virtio_device *dev, unsigned nvqs,
+			struct virtqueue *vqs[], vq_callback_t *callbacks[],
+			const char * const names[], const bool *ctx,
+			struct irq_affinity *desc) 
+{
+	return 0;
+}
+
+static void virtnet_probe_test_2(struct kunit *test) {
+    global_test = test;
+    int err = 0;
+    printk("\n\n\nStart VirtnetProbeTest main\n\n\n");
+    // device initialization
+    struct virtio_device dev_s = {.config = &VIRTIO_TEST_MAIN_CONFIG_OPS, };
+    device_initialize(&dev_s.dev);
+    dev_s.dev.parent = NULL;
+    dev_s.dev.kobj.parent = NULL;
+
+    /// Features for device_driver
+    const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
+                                          VIRTIO_NET_F_RSS,
+                                          VIRTIO_NET_F_CTRL_VQ,
+                                          VIRTIO_NET_F_CSUM,
+                                          VIRTIO_NET_F_GUEST_CSUM,
+                                          VIRTIO_NET_F_GUEST_TSO4,
+                                          VIRTIO_NET_F_GUEST_TSO6,
+                                          VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
+                                          VIRTIO_NET_F_MAC, 
+                                          VIRTIO_NET_F_GUEST_ECN,
+                                          VIRTIO_NET_F_GUEST_UFO,
+                                          VIRTIO_NET_F_MRG_RXBUF,
+                                          VIRTIO_NET_F_HASH_REPORT,
+                                          VIRTIO_F_ANY_LAYOUT,
+                                          VIRTIO_NET_F_MTU,
+                                          VIRTIO_NET_F_STATUS,
+										  VIRTIO_NET_F_GSO,
+										  VIRTIO_NET_F_HOST_TSO4,
+										  VIRTIO_NET_F_HOST_TSO6,
+										  VIRTIO_NET_F_HOST_ECN,
+										  VIRTIO_NET_F_HOST_USO,
+										  };
+
+    struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
+    drv_s.feature_table_size_legacy = 21;
+    dev_s.dev.driver = &drv_s.driver;
+
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
+
+
+    // virtio_device initialization
+    struct virtio_device *dev = &dev_s;
+    struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+
+
+    // Virtnet probe test
+    err = virtnet_probe(dev);
+
+    printk("\nLOG: TEST main finished \n");
+
+    KUNIT_EXPECT_EQ(test, err, 0);
+}
+
+///////////////////// Test 3 /////////////////////
+
+static void virtnet_probe_test_3(struct kunit *test)
+{
+    global_test = test;
+    printk("\n\n\nStart Test 1\n\n\n");
+
+	// set handler functions
+    struct virtio_device dev_s = {.config = &VIRTIO_TEST_1_CONFIG_OPS, };
+    device_initialize(&dev_s.dev);
+    dev_s.dev.parent = NULL;
+    dev_s.dev.kobj.parent = NULL;
+
+    /// Features for device_driver
+    const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
+                                          VIRTIO_NET_F_RSS,
+                                          VIRTIO_NET_F_CTRL_VQ,
+                                          VIRTIO_NET_F_CSUM,
+                                          VIRTIO_NET_F_GUEST_CSUM,
+                                          VIRTIO_NET_F_GUEST_TSO4,
+                                          VIRTIO_NET_F_GUEST_TSO6,
+                                          VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
+                                          VIRTIO_NET_F_MAC, 
+                                          VIRTIO_NET_F_GUEST_ECN,
+                                          VIRTIO_NET_F_GUEST_UFO,
+                                          VIRTIO_NET_F_MRG_RXBUF,
+                                          VIRTIO_NET_F_HASH_REPORT,
+                                          VIRTIO_F_ANY_LAYOUT,
+                                          VIRTIO_NET_F_MTU,
+                                          VIRTIO_NET_F_STATUS,
+										  VIRTIO_NET_F_CTRL_VLAN,
+										  VIRTIO_NET_F_GSO,
+										  VIRTIO_NET_F_HOST_TSO4,
+										  VIRTIO_NET_F_HOST_TSO6,
+										  VIRTIO_NET_F_HOST_ECN,
+										  VIRTIO_NET_F_HOST_USO};
+    // struct virtio_driver drv_s = {.feature_table = feature_table};
+    // drv_s.feature_table_size = 16;
+    struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
+    drv_s.feature_table_size_legacy = 22;
+    dev_s.dev.driver = &drv_s.driver;
+
+	// Add features
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MQ);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
+
+
+
+    // virtio_device initialization
+    struct virtio_device *dev = &dev_s;
+    struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+    u64 device_features;
+	u64 driver_features;
+	u64 driver_features_legacy;
+    int err = 0;
+
+    // Virtnet probe test
+    err = virtnet_probe(dev);
+
+    KUNIT_EXPECT_EQ(test, err, 0);
+}
+
+///////////////////// Test 4 /////////////////////
+
+static void virtnet_probe_test_4(struct kunit *test)
+{
+    global_test = test;
+	// set handler functions
+    struct virtio_device dev_s = {.config = &VIRTIO_TEST_1_CONFIG_OPS, };
+    device_initialize(&dev_s.dev);
+    dev_s.dev.parent = NULL;
+    dev_s.dev.kobj.parent = NULL;
+
+    /// Features for device_driver
+    const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
+                                          VIRTIO_NET_F_RSS,
+                                          VIRTIO_NET_F_CTRL_VQ,
+                                          VIRTIO_NET_F_CSUM,
+                                          VIRTIO_NET_F_GUEST_CSUM,
+                                          VIRTIO_NET_F_GUEST_TSO4,
+                                          VIRTIO_NET_F_GUEST_TSO6,
+                                          VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
+                                          VIRTIO_NET_F_MAC, 
+                                          VIRTIO_NET_F_GUEST_ECN,
+                                          VIRTIO_NET_F_GUEST_UFO,
+                                          VIRTIO_NET_F_MRG_RXBUF,
+                                          VIRTIO_NET_F_HASH_REPORT,
+                                          VIRTIO_F_ANY_LAYOUT,
+                                          VIRTIO_NET_F_MTU,
+                                          VIRTIO_NET_F_STATUS,
+										  VIRTIO_NET_F_CTRL_VLAN,
+										  VIRTIO_NET_F_GSO,
+										  VIRTIO_NET_F_HOST_TSO4,
+										  VIRTIO_NET_F_HOST_TSO6,
+										  VIRTIO_NET_F_HOST_ECN,
+										  VIRTIO_NET_F_HOST_USO};
+    // struct virtio_driver drv_s = {.feature_table = feature_table};
+    // drv_s.feature_table_size = 16;
+    struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
+    drv_s.feature_table_size_legacy = 22;
+    dev_s.dev.driver = &drv_s.driver;
+
+	// Add features
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
+
+
+
+    // virtio_device initialization
+    struct virtio_device *dev = &dev_s;
+    struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+    u64 device_features;
+	u64 driver_features;
+	u64 driver_features_legacy;
+    int err = 0;
+
+    // Virtnet probe test
+    err = virtnet_probe(dev);
+
+    KUNIT_EXPECT_EQ(test, err, 0);
+}
+
+///////////////////// Test 5 /////////////////////
+
+
+static void virtnet_probe_test_5(struct kunit *test)
+{
+    global_test = test;
+    // set handler functions
+    struct virtio_device dev_s = {.config = &VIRTIO_TEST_1_CONFIG_OPS, };
+    device_initialize(&dev_s.dev);
+    dev_s.dev.parent = NULL;
+    dev_s.dev.kobj.parent = NULL;
+
+    /// Features for device_driver
+    const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
+                                          VIRTIO_NET_F_RSS,
+                                          VIRTIO_NET_F_CTRL_VQ,
+                                          VIRTIO_NET_F_CSUM,
+                                          VIRTIO_NET_F_GUEST_CSUM,
+                                          VIRTIO_NET_F_GUEST_TSO4,
+                                          VIRTIO_NET_F_GUEST_TSO6,
+                                          VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
+                                          VIRTIO_NET_F_MAC, 
+                                          VIRTIO_NET_F_GUEST_ECN,
+                                          VIRTIO_NET_F_GUEST_UFO,
+                                          VIRTIO_NET_F_MRG_RXBUF,
+                                          VIRTIO_NET_F_HASH_REPORT,
+                                          VIRTIO_F_ANY_LAYOUT,
+                                          VIRTIO_NET_F_MTU,
+                                          VIRTIO_NET_F_STATUS,
+										  VIRTIO_NET_F_CTRL_VLAN,
+										  VIRTIO_NET_F_GSO,
+										  VIRTIO_NET_F_HOST_TSO4,
+										  VIRTIO_NET_F_HOST_TSO6,
+										  VIRTIO_NET_F_HOST_ECN,
+										  VIRTIO_NET_F_HOST_USO};
+    struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
+    drv_s.feature_table_size_legacy = 22;
+    dev_s.dev.driver = &drv_s.driver;
+
+	// Add features
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_GSO);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_HOST_TSO4);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_HOST_TSO6);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_HOST_ECN);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_HOST_USO);
+
+    // virtio_device initialization
+    struct virtio_device *dev = &dev_s;
+    struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+    u64 device_features;
+	u64 driver_features;
+	u64 driver_features_legacy;
+    int err = 0;
+
+    // Virtnet probe test
+    err = virtnet_probe(dev);
+
+    KUNIT_EXPECT_EQ(test, err, 0);
 }
 
 static void sum_example_test(struct kunit *test)
@@ -385,8 +639,13 @@ static void sum_example_test(struct kunit *test)
 
 static struct kunit_case example_test_cases[] = {
 	KUNIT_CASE(sum_example_test),
-	KUNIT_CASE(virnet_probe_test_main),
-	KUNIT_CASE(virnet_probe_test_1), 
+	KUNIT_CASE(virnet_probe_test_main), // in 3735
+	KUNIT_CASE(virtnet_probe_test_1), // out 3735, out 3755
+	KUNIT_CASE(virtnet_probe_test_2), // in 3755, in 3755
+	KUNIT_CASE(virtnet_probe_test_3), // out 3735, in 3755
+	KUNIT_CASE(virtnet_probe_test_4), // out 3730
+	KUNIT_CASE(virtnet_probe_test_5), //
+
 };
 
 static struct kunit_suite example_test_suite = {

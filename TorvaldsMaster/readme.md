@@ -52,30 +52,34 @@
 
 ### Changed files
 
-- [drivers/net/Kconfig](drivers-net-Kconfig)
+- [linux/drivers/net/Kconfig](/linux/drivers/net/Kconfig)
 
-- [drivers/net/Makefile](drivers-net-Makefile)
+- [linux/drivers/net/Makefile](/linux/drivers/net/Makefile)
 
-- [drivers/net/virtio_net.c](virtio_net.c)
-
-- [include/linux/virtio_net.h](virtio_net.h)
-
-- [drivers/net/virtio_test.c](virtio_test.c)
+- [linux/drivers/net/virtio_net.c](/linux/drivers/net/virtio_net.c)
 
 -----------------
 
-- [drivers/base/power/qos-test.c](drivers-base-power-qos-test.c)
-
-- [drivers/base/test/Kconfig](drivers-base-test-Kconfig)
+- [linux/.kunit/.kunitconfig](/linux/.kuint/.kunitconfig)
 
 -----------------
 
-- [lib/slub_kunit.c](lib-slub_kunit.c)
+### Added files
 
-- [lib/Kconfig.debug](lib-Kconfig.debug)
+- [linux/drivers/net/virtio_net_test.c](/linux/drivers/net/virtio_net_test.c)
+
+- [linux/drivers/net/virtio_net_test.h](/linux/drivers/net/virtio_net_test.h)
 
 -----------------
 
-- [net/core/dev_addr_lists_test.c](net-core-dev_addr_lists_test.c)
+### Notes, Kernel, basics
 
-- [net/Kconfig](net-Kconfig)
+__Classes__
+
+Classes are not a construct that is built into the C programming language; however, it is an easily derived concept. Accordingly, in most cases, every project that does not use a standardized object oriented library (like GNOME’s GObject) has their own slightly different way of doing object oriented programming; the Linux kernel is no exception.
+
+The central concept in kernel object oriented programming is the class. In the kernel, a class is a struct that contains function pointers. This creates a contract between implementers and users since it forces them to use the same function signature without having to call the function directly. To be a class, the function pointers must specify that a pointer to the class, known as a class handle, be one of the parameters. Thus the member functions (also known as methods) have access to member variables (also known as fields) allowing the same implementation to have multiple instances.
+
+A class can be overridden by child classes by embedding the parent class in the child class. Then when the child class method is called, the child implementation knows that the pointer passed to it is of a parent contained within the child. Thus, the child can compute the pointer to itself because the pointer to the parent is always a fixed offset from the pointer to the child. This offset is the offset of the parent contained in the child struct.
+
+
