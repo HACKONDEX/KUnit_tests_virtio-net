@@ -49,6 +49,20 @@
 		CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
 		CONFIG_DEBUG_KERNEL=y
 
+### Running with `gcov` tool
+
+- We want __virtio_net.c__ to be profiled with `gcov`, so we add these line in `linux/drivers/net/Makefile`
+
+		GCOV_PROFILE_virtio_net.o := y
+
+- Also to run with gcov we should add appropriate configs to `.kuintconfig` in `linux/.kunit`
+
+		CONFIG_DEBUG_FS=y
+		CONFIG_GCOV_KERNEL=y
+
+- Then we just run kuint test using basic run command of kunit tool, with gcov it will take a little more time to compile and run. It may not finish successfuly, in that case try again.
+
+- File `.kunit/drivers/net/virtio_net.gcno` must be created after a successful run.
 
 ### Changed files
 
