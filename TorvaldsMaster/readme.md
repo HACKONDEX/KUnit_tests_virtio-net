@@ -49,7 +49,13 @@
 		CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
 		CONFIG_DEBUG_KERNEL=y
 
-### Running with `gcov` tool
+## Running in `qemu`
+
+- Run test isolated using arg `--run_isolated "test"`
+
+- `./tools/testing/kunit/kunit.py run --arch=x86_64 --run_isolated "test"`
+
+### Running with `gcov` tool (Doesn't work)
 
 - We want __virtio_net.c__ to be profiled with `gcov`, so we add these line in `linux/drivers/net/Makefile`
 

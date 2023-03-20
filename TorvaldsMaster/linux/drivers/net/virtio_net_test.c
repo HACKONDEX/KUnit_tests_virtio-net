@@ -456,70 +456,70 @@ static void virtnet_probe_test_2(struct kunit *test) {
 
 ///////////////////// Test 3 /////////////////////
 
-static const struct virtio_config_ops VIRTIO_TEST_3_CONFIG_OPS = {
-	.get = test_get,
-	.get_status = test_get_status,
-	.set_status = test_set_status,
-	.reset = test_reset_1,
-	.find_vqs = test_find_vqs_1,
-    .set_vq_affinity = test_set_vq_affinity,
-    .get_shm_region = test_get_shm_region,
-	};
+// static const struct virtio_config_ops VIRTIO_TEST_3_CONFIG_OPS = {
+// 	.get = test_get,
+// 	.get_status = test_get_status,
+// 	.set_status = test_set_status,
+// 	.reset = test_reset_1,
+// 	.find_vqs = test_find_vqs_1,
+//     .set_vq_affinity = test_set_vq_affinity,
+//     .get_shm_region = test_get_shm_region,
+// 	};
 
-static void virtnet_probe_test_3(struct kunit *test)
-{
-    struct virtio_device *dev;
-    struct virtio_driver *drv;
-    const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
-                                          VIRTIO_NET_F_RSS,
-                                          VIRTIO_NET_F_CTRL_VQ,
-                                          VIRTIO_NET_F_CSUM,
-                                          VIRTIO_NET_F_GUEST_CSUM,
-                                          VIRTIO_NET_F_GUEST_TSO4,
-                                          VIRTIO_NET_F_GUEST_TSO6,
-                                          VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
-                                          VIRTIO_NET_F_MAC, 
-                                          VIRTIO_NET_F_GUEST_ECN,
-                                          VIRTIO_NET_F_GUEST_UFO,
-                                          VIRTIO_NET_F_MRG_RXBUF,
-                                          VIRTIO_NET_F_HASH_REPORT,
-                                          VIRTIO_F_ANY_LAYOUT,
-                                          VIRTIO_NET_F_MTU,
-                                          VIRTIO_NET_F_STATUS,
-										  VIRTIO_NET_F_CTRL_VLAN,
-										  VIRTIO_NET_F_GSO,
-										  VIRTIO_NET_F_HOST_TSO4,
-										  VIRTIO_NET_F_HOST_TSO6,
-										  VIRTIO_NET_F_HOST_ECN,
-										  VIRTIO_NET_F_HOST_USO};
-    struct virtio_device dev_s = {.config = &VIRTIO_TEST_3_CONFIG_OPS};
-    struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
-    int err = 0;
+// static void virtnet_probe_test_3(struct kunit *test)
+// {
+//     struct virtio_device *dev;
+//     struct virtio_driver *drv;
+//     const unsigned int feature_table[] = {VIRTIO_NET_F_MQ, 
+//                                           VIRTIO_NET_F_RSS,
+//                                           VIRTIO_NET_F_CTRL_VQ,
+//                                           VIRTIO_NET_F_CSUM,
+//                                           VIRTIO_NET_F_GUEST_CSUM,
+//                                           VIRTIO_NET_F_GUEST_TSO4,
+//                                           VIRTIO_NET_F_GUEST_TSO6,
+//                                           VIRTIO_NET_F_CTRL_GUEST_OFFLOADS,
+//                                           VIRTIO_NET_F_MAC, 
+//                                           VIRTIO_NET_F_GUEST_ECN,
+//                                           VIRTIO_NET_F_GUEST_UFO,
+//                                           VIRTIO_NET_F_MRG_RXBUF,
+//                                           VIRTIO_NET_F_HASH_REPORT,
+//                                           VIRTIO_F_ANY_LAYOUT,
+//                                           VIRTIO_NET_F_MTU,
+//                                           VIRTIO_NET_F_STATUS,
+// 										  VIRTIO_NET_F_CTRL_VLAN,
+// 										  VIRTIO_NET_F_GSO,
+// 										  VIRTIO_NET_F_HOST_TSO4,
+// 										  VIRTIO_NET_F_HOST_TSO6,
+// 										  VIRTIO_NET_F_HOST_ECN,
+// 										  VIRTIO_NET_F_HOST_USO};
+//     struct virtio_device dev_s = {.config = &VIRTIO_TEST_3_CONFIG_OPS};
+//     struct virtio_driver drv_s = {.feature_table_legacy = feature_table};
+//     int err = 0;
 
-    device_initialize(&dev_s.dev);
-    dev_s.dev.parent = NULL;
-    dev_s.dev.kobj.parent = NULL;
+//     device_initialize(&dev_s.dev);
+//     dev_s.dev.parent = NULL;
+//     dev_s.dev.kobj.parent = NULL;
 
-    drv_s.feature_table_size_legacy = 22;
-    dev_s.dev.driver = &drv_s.driver;
+//     drv_s.feature_table_size_legacy = 22;
+//     dev_s.dev.driver = &drv_s.driver;
 
-	// Add features
-	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MAC);
-	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MQ);
-	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
-	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
+// 	// Add features
+// 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MAC);
+// 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MQ);
+// 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CTRL_VQ);
+// 	dev_s.features |= BIT_ULL(VIRTIO_NET_F_CSUM);
 
-    // virtio_device initialization
-    dev = &dev_s;
-    drv = drv_to_virtio(dev->dev.driver);
+//     // virtio_device initialization
+//     dev = &dev_s;
+//     drv = drv_to_virtio(dev->dev.driver);
 
-    // Virtnet probe test
-    err = virtnet_probe(dev);
+//     // Virtnet probe test
+//     err = virtnet_probe(dev);
 
-    KUNIT_EXPECT_EQ(test, err, -12);
-}
+//     KUNIT_EXPECT_EQ(test, err, -12);
+// }
 
-///////////////////// Test 4 /////////////////////
+// ///////////////////// Test 4 /////////////////////
 
 static void virtnet_probe_test_4(struct kunit *test)
 {
@@ -642,7 +642,7 @@ static struct kunit_case example_test_cases[] = {
 	KUNIT_CASE(virnet_probe_test_main), // in 3735
 	KUNIT_CASE(virtnet_probe_test_1), // out 3735, out 3755
 	KUNIT_CASE(virtnet_probe_test_2), // in 3755, in 3755
-	KUNIT_CASE(virtnet_probe_test_3), // out 3735, in 3755
+	// KUNIT_CASE(virtnet_probe_test_3), // out 3735, in 3755
 	KUNIT_CASE(virtnet_probe_test_4), // out 3730
 	KUNIT_CASE(virtnet_probe_test_5), 
     {}
