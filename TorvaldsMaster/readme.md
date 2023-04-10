@@ -20,6 +20,10 @@
 
 - `mount -t debugfs none /sys/kernel/debug` __-__ mount debugfs and get the coverage gdna gdno files
 
+- `lcov -t "virtio_test" -o coverage.info -c -d gcovFiles` __-__ get coverage from __gcda__ & __gcno__ files which lay in __gcovFiles__ directory
+
+- `genhtml -o coverage.result coverage.info` __-__ generates coverage visualisation in directory __coverage.results__
+
 ### Configs
 
 - To run kuint tests for `virtio_net` add configuration in file __`linux/drivers/net/Kconfig`__
