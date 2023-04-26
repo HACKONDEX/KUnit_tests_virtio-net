@@ -67,6 +67,11 @@ Linux Kernel VirtioNet test research
 		CONFIG_DEBUG_KERNEL=y
 
 
+- Confgis for _gcov_ to get coverage data for kernel
+
+		CONFIG_DEBUG_FS=y
+		CONFIG_GCOV_KERNEL=y
+
 - COnfigs for virtio-fs
 
 		CONFIG_VIRTIO
