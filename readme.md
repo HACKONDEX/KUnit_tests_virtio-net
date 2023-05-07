@@ -199,6 +199,10 @@ A class can be overridden by child classes by embedding the parent class in the 
 
 [virtio-fs con](https://www.youtube.com/watch?v=wM5OB0PGIQA)
 
+[Securely booting confidential VMs with encrypting disk](https://www.youtube.com/watch?v=4wZnl0njxm8)
+
+[elixir.bootlin.com](https://elixir.bootlin.com/linux/latest/source)
+
 ---
 
 [linux kernel testing and debugging](https://www.linuxjournal.com/content/linux-kernel-testing-and-debugging)
@@ -207,4 +211,6 @@ A class can be overridden by child classes by embedding the parent class in the 
 
 [docs oasis](https://docs.oasis-open.org/virtio/virtio/v1.2/cs01/virtio-v1.2-cs01.html#x1-20001)
 
+2. [ibm software testing](https://www.ibm.com/topics/software-testing)
 
+2. [testing](https://www.guru99.com/software-testing-introduction-importance.html)
