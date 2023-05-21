@@ -171,7 +171,7 @@ A class can be overridden by child classes by embedding the parent class in the 
 
 [Introduction to virtio-networking and vhost-net](https://www.redhat.com/en/blog/introduction-virtio-networking-and-vhost-net)
 
-[Build linux kernel(https://phoenixnap.com/kb/build-linux-kernel)
+[Build linux kernel](https://phoenixnap.com/kb/build-linux-kernel)
 
 [Linux kernel with qemu](https://medium.com/@daeseok.youn/prepare-the-environment-for-developing-linux-kernel-with-qemu-c55e37ba8ade)
 
