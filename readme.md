@@ -203,6 +203,8 @@ A class can be overridden by child classes by embedding the parent class in the 
 
 [elixir.bootlin.com](https://elixir.bootlin.com/linux/latest/source)
 
+[KConfig language](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html)
+
 ---
 
 [linux kernel testing and debugging](https://www.linuxjournal.com/content/linux-kernel-testing-and-debugging)
@@ -216,3 +218,32 @@ A class can be overridden by child classes by embedding the parent class in the 
 2. [testing](https://www.guru99.com/software-testing-introduction-importance.html)
 
 3. [unit testing](https://www.techtarget.com/searchsoftwarequality/definition/unit-testing#:~:text=Unit%20testing%20is%20a%20software,tests%20during%20the%20development%20process.)
+
+
+# StepByStep
+
+- `cd ~`
+
+- `mkdir workspace`
+
+- `cd workspace`
+
+- `wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.3.tar.xz`
+
+- `tar xvf linux-5.10.3.tar.xz`
+
+- `wget https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/11.3.0/x86_64-gcc-11.3.0-nolibc-x86_64-linux.tar.xz`
+
+- `tar xvf x86_64-gcc-11.3.0-nolibc-x86_64-linux.tar.xz`
+
+- `cd linux-5.10.3`
+
+- `./tools/testing/kunit/kunit.py run`
+
+- `cd drivers/net`
+
+- `touch virtio_net_test.c virtio_net_test.h`
+
+- `cd ../..`
+
+- 
