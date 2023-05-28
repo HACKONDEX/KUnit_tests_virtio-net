@@ -1,0 +1,12 @@
+
+# Original implementation
+
+config VIRTIO_NET_TEST
+	tristate "Test for virtio_net" if !KUNIT_ALL_TESTS
+	depends on KUNIT=y
+	select NETDEVICES
+	select NET_CORE
+	select VIRTIO
+	select VIRTIO_NET
+ 	select NET
+	default KUNIT_ALL_TESTS
