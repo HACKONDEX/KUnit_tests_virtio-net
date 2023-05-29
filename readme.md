@@ -74,12 +74,12 @@ Linux Kernel VirtioNet test research
 
 - COnfigs for virtio-fs
 
-		CONFIG_VIRTIO
-	        CONFIG_VIRTIO_FS
-	        CONFIG_DAX
-	        CONFIG_FS_DAX
-	        CONFIG_DAX_DRIVER
-	        CONFIG_ZONE_DEVICE
+		CONFIG_VIRTIO=y
+        CONFIG_VIRTIO_FS=y
+        CONFIG_DAX=y
+        CONFIG_FS_DAX=y
+        CONFIG_DAX_DRIVER=y
+        CONFIG_ZONE_DEVICE=y
 
 ---------------------
 
@@ -112,12 +112,14 @@ Linux Kernel VirtioNet test research
 
 - Compile the kernel with required configs on
 
-			CONFIG_VIRTIO
-	        CONFIG_VIRTIO_FS
-	        CONFIG_DAX
-	        CONFIG_FS_DAX
-	        CONFIG_DAX_DRIVER
-	        CONFIG_ZONE_DEVICE
+			CONFIG_VIRTIO=y
+			CONFIG_VIRTIO_FS=y
+	        CONFIG_DAX=y
+	        CONFIG_FS_DAX=y
+	        CONFIG_DAX_DRIVER=y
+	        CONFIG_ZONE_DEVICE=y
+
+- After compilation finishes we can find __bzImage__ with path `arch/x86/boot/bzImage` which is a binary file
 
 - Create ramfs `ramdisk.img` file with command `mkinitramfs -o ramdiks.img` and keep it in one directory with `bzImage`
 
