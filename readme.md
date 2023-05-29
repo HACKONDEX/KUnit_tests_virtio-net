@@ -205,6 +205,8 @@ A class can be overridden by child classes by embedding the parent class in the 
 
 [KConfig language](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html)
 
+[Martin Fowler, vocabulary](https://martinfowler.com/bliki/TestDouble.html)
+
 ---
 
 [linux kernel testing and debugging](https://www.linuxjournal.com/content/linux-kernel-testing-and-debugging)
@@ -218,6 +220,12 @@ A class can be overridden by child classes by embedding the parent class in the 
 2. [testing](https://www.guru99.com/software-testing-introduction-importance.html)
 
 3. [unit testing](https://www.techtarget.com/searchsoftwarequality/definition/unit-testing#:~:text=Unit%20testing%20is%20a%20software,tests%20during%20the%20development%20process.)
+
+4. [habr testing](https://habr.com/ru/articles/549054/)
+
+5. [amazon debug](https://aws.amazon.com/what-is/debugging/#:~:text=Debugging%20is%20the%20process%20of,determine%20why%20any%20errors%20occurred.)
+
+6. [Martin Fowler, vocabulary](https://martinfowler.com/bliki/TestDouble.html)
 
 
 # StepByStep
