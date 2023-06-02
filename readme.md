@@ -162,6 +162,46 @@ Linux kernel Virtio-net test research
 
 ---------------------
 
+## kernel compile guide
+
+- `make menuconfig` **-** creates __.config__ file in __linux__ directory
+
+- Add next configs in order to compile with kunit test, gcov and virtiofs
+
+			CONFIG_KUNIT=y
+			CONFIG_KUNIT_ALL_TESTS=y
+			CONFIG_KUNIT_DEBUGFS=y
+			CONFIG_KUNIT_TEST=y
+			CONFIG_KUNIT_DEFAULT_ENABLED=y
+
+			CONFIG_VIRTIO=y
+			CONFIG_VIRTIO_FS=y
+			CONFIG_DAX=y
+			CONFIG_FS_DAX=y
+			CONFIG_DAX_DRIVER=y
+			CONFIG_ZONE_DEVICE=y
+
+			CONFIG_DEBUG_FS=y
+			CONFIG_GCOV_KERNEL=y
+			CONFIG_GCOV_PROFILE_FTRACE=y
+
+- If you have error like this on __ubuntu__
+
+`CC      certs/system_keyring.o
+make[2]: *** No rule to make target 'debian/canonical-certs.pem', needed by 'certs/x509_certificate_list'.  Stop.
+make[1]: *** [scripts/Makefile.build:504: certs] Error 2
+make: *** [Makefile:2021: .] Error 2
+`
+
+- Then this commands can help
+
+`scripts/config --disable SYSTEM_TRUSTED_KEYS`
+
+`scripts/config --disable SYSTEM_REVOCATION_KEYS`
+
+- After running both commands above, run `make` and tab `enter` for both __new__ options
+
+
 ### Notes, Kernel, basics
 
 __Classes__
