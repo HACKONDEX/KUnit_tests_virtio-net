@@ -1,7 +1,6 @@
 # Kernel-Virtio-Research
-Linux Kernel VirtioNet test research
 
-# Virtio-Net test research
+Linux kernel Virtio-net test research
 
 ## KUnit test
 
@@ -66,13 +65,12 @@ Linux Kernel VirtioNet test research
 		CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
 		CONFIG_DEBUG_KERNEL=y
 
-
 - Confgis for _gcov_ to get coverage data for kernel
 
 		CONFIG_DEBUG_FS=y
 		CONFIG_GCOV_KERNEL=y
 
-- COnfigs for virtio-fs
+- Configs for virtio-fs
 
 		CONFIG_VIRTIO=y
         CONFIG_VIRTIO_FS=y
@@ -90,21 +88,30 @@ Linux Kernel VirtioNet test research
 
 - `./tools/testing/kunit/kunit.py run --arch=x86_64 --run_isolated "test"`
 
-### Running with `gcov` tool (Doesn't work)
+### Running with `gcov` tool
+
+- In order to get coverage .gcno .gcda files, we need to compile and run the kernel.
+
+- We can do it manually installing compiled kernel into our OS, or run a VM with compiled kernel using qemu.
 
 - We want __virtio_net.c__ to be profiled with `gcov`, so we add these line in `linux/drivers/net/Makefile`
 
 		GCOV_PROFILE_virtio_net.o := y
 
-- Also to run with gcov we should add appropriate configs to `.kuintconfig` in `linux/.kunit`
+- Also to run with gcov we should add appropriate configs to `.config`.
 
 		CONFIG_DEBUG_FS=y
 		CONFIG_GCOV_KERNEL=y
 
-- Then we just run kuint test using basic run command of kunit tool, with gcov it will take a little more time to compile and run. It may not finish successfuly, in that case try again.
+- Compile the kernel and run in VM
 
-- File `.kunit/drivers/net/virtio_net.gcno` must be created after a successful run.
+- In guest VM terminal run next command to get the appropiate files
 
+`mount -t debugfs none /sys/kernel/debug` 
+
+- After that you can find .gcda file in /sys/kernel/debug/gcov
+
+- The .gcno file must be available after compiling the kernel
 
 ---------------------
 
@@ -115,9 +122,9 @@ Linux Kernel VirtioNet test research
 			CONFIG_VIRTIO=y
 			CONFIG_VIRTIO_FS=y
 	        CONFIG_DAX=y
-	        CONFIG_FS_DAX=y
-	        CONFIG_DAX_DRIVER=y
-	        CONFIG_ZONE_DEVICE=y
+		        CONFIG_FS_DAX=y
+		        CONFIG_DAX_DRIVER=y
+		        CONFIG_ZONE_DEVICE=y
 
 - After compilation finishes we can find __bzImage__ with path `arch/x86/boot/bzImage` which is a binary file
 
@@ -214,6 +221,10 @@ A class can be overridden by child classes by embedding the parent class in the 
 [linux kernel testing and debugging](https://www.linuxjournal.com/content/linux-kernel-testing-and-debugging)
 
 [virtio networking red hat](https://www.redhat.com/en/blog/introduction-virtio-networking-and-vhost-net)
+
+[virtio net failover introduction](https://www.redhat.com/en/blog/virtio-net-failover-introduction)
+
+[deep into vhost, virtio-networking](https://www.redhat.com/en/blog/deep-dive-virtio-networking-and-vhost-net)
 
 [docs oasis](https://docs.oasis-open.org/virtio/virtio/v1.2/cs01/virtio-v1.2-cs01.html#x1-20001)
 
