@@ -1,5 +1,9 @@
 #include "virtio_net_test.h"
 
+// globals
+
+struct kunit *global_test;
+
 // mock and fake methods
 void fake_klist_get(struct klist_node* n) {}
 
@@ -28,7 +32,7 @@ void mock_init_virtqueues(struct virtio_device *dev,
 	int i;
 
 	for (i = 0; i < nvqs; ++i) {
-        vring_vq = kcalloc(1, sizeof(struct vring_virtqueue), GFP_KERNEL);
+        vring_vq = kunit_kzalloc(global_test, sizeof(struct vring_virtqueue), GFP_KERNEL);
         vqs[i] = &(vring_vq->vq);
         vqs[i]->vdev = dev;
     }
@@ -40,22 +44,22 @@ void mock_init_kobjects(struct virtnet_info *vi) {
     struct klist_node* k_node;
 
 	init_dev = &vi->dev->dev;
-	kn = kcalloc(1, sizeof(struct kernfs_node), GFP_KERNEL);
+	kn = kunit_kzalloc(global_test, sizeof(struct kernfs_node), GFP_KERNEL);
 
 	init_dev->parent->kobj.sd = kn;
 	kn->parent = NULL;
 
-	kn->dir.root = kcalloc(1, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
+	kn->dir.root = kunit_kzalloc(global_test, KERNFS_ROOT_MEM_SIZE, GFP_KERNEL);
 	kn->dir.root->ino_idr.idr_rt.xa_flags = IDR_RT_MARKER;
 	atomic_set(&kn->count, 1);
 
 	// init kernfs_node & klist objects
 	kn->flags = 17;
 
-	init_dev->parent->p = kcalloc(1, sizeof(struct device_private), GFP_KERNEL);
+	init_dev->parent->p = kunit_kzalloc(global_test, sizeof(struct device_private), GFP_KERNEL);
 	init_dev->parent->p->klist_children.get = fake_klist_get;
 	
-	k_node = kcalloc(1, sizeof(struct klist_node), GFP_KERNEL);
+	k_node = kunit_kzalloc(global_test, sizeof(struct klist_node), GFP_KERNEL);
 	init_dev->parent->p->klist_children.k_list.prev = &(k_node->n_node);
 
 	// init parent device name
@@ -143,7 +147,7 @@ int mock_find_vqs_stress(struct virtio_device *dev, unsigned nvqs,
 		}
 	}
 
-    vring_cvq = kcalloc(1, sizeof(struct vring_virtqueue), GFP_KERNEL);
+    vring_cvq = kunit_kzalloc(global_test, sizeof(struct vring_virtqueue), GFP_KERNEL);
     vinfo->cvq = &(vring_cvq->vq);
     cvq = vinfo->cvq;
     cvq->vdev = dev;
@@ -157,11 +161,11 @@ int mock_find_vqs_stress(struct virtio_device *dev, unsigned nvqs,
 	cvq_vvrq->vq.num_free = 1;
 	cvq_vvrq->notify = mock_notify;
 
-	cvq_vvrq->split.desc_state = kcalloc(1, sizeof(struct vring_desc_state_split), GFP_KERNEL);
-	cvq_vvrq->split.vring.desc = kcalloc(1, sizeof(struct vring_desc), GFP_KERNEL);
-    cvq_vvrq->split.desc_extra = kcalloc(1, sizeof(struct vring_desc_extra), GFP_KERNEL);
-    cvq_vvrq->split.vring.avail = kcalloc(1, sizeof(vring_avail_t) + 2 * sizeof(__virtio16), GFP_KERNEL);
-    cvq_vvrq->split.vring.used = kcalloc(1, sizeof(vring_used_t) + 2 * sizeof(vring_used_elem_t), GFP_KERNEL);
+	cvq_vvrq->split.desc_state = kunit_kzalloc(global_test, sizeof(struct vring_desc_state_split), GFP_KERNEL);
+	cvq_vvrq->split.vring.desc = kunit_kzalloc(global_test, sizeof(struct vring_desc), GFP_KERNEL);
+    cvq_vvrq->split.desc_extra = kunit_kzalloc(global_test, sizeof(struct vring_desc_extra), GFP_KERNEL);
+    cvq_vvrq->split.vring.avail = kunit_kzalloc(global_test, sizeof(vring_avail_t) + 2 * sizeof(__virtio16), GFP_KERNEL);
+    cvq_vvrq->split.vring.used = kunit_kzalloc(global_test, sizeof(vring_used_t) + 2 * sizeof(vring_used_elem_t), GFP_KERNEL);
 
     cvq_vvrq->last_used_idx = 1;
     cvq_vvrq->split.vring.num = 1;
@@ -211,6 +215,7 @@ static void test_0(struct kunit *test)
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
 
     // device initialization
     device_initialize(&dev_s.dev);
@@ -240,6 +245,7 @@ static void test_1(struct kunit *test) {
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
 
 	// device initialization
     device_initialize(&dev_s.dev);
@@ -273,6 +279,7 @@ static void test_2(struct kunit *test)
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
 
 	// device initialization
     device_initialize(&dev_s.dev);
@@ -309,6 +316,7 @@ static void test_3(struct kunit *test)
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
 
 	// device initialization
     device_initialize(&dev_s.dev);
@@ -342,6 +350,7 @@ static void test_4(struct kunit *test) {
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
 
 	// device initialization
     device_initialize(&dev_s.dev);
@@ -378,6 +387,7 @@ static void test_5(struct kunit *test)
 		.feature_table_legacy = features_legacy,
 		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
     int err = 0;
+	global_test = test;
     
 	// device initialization
     device_initialize(&dev_s.dev);
