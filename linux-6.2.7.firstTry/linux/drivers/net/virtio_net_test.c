@@ -896,6 +896,40 @@ static void virtnet_probe_test_5(struct kunit *test)
     KUNIT_EXPECT_EQ(test, err, 0);
 }
 
+static void virtnet_probe_test_7(struct kunit *test) {
+struct virtio_device *dev;
+    struct virtio_driver *drv;
+    struct virtio_device dev_s = {.config = &VIRTIO_TEST_6_CONFIG_OPS};
+    struct virtio_driver drv_s = {
+		.feature_table = features,
+		.feature_table_size = ARRAY_SIZE(features),
+		.feature_table_legacy = features_legacy,
+		.feature_table_size_legacy = ARRAY_SIZE(features_legacy)};
+    int err = 0;
+
+    // device initialization
+    device_initialize(&dev_s.dev);
+    dev_s.dev.parent = NULL;
+    dev_s.dev.kobj.parent = NULL;
+
+    dev_s.dev.driver = &drv_s.driver;
+
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_NOTF_COAL);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_HASH_REPORT);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_MTU);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_RSS);
+	dev_s.features |= BIT_ULL(VIRTIO_NET_F_STANDBY);
+
+    // virtio_device initialization
+    dev = &dev_s;
+    drv = drv_to_virtio(dev->dev.driver);
+
+    // Virtnet probe test
+    err = virtnet_probe(dev);
+
+    KUNIT_EXPECT_EQ(test, err, 0);
+}
+
 static void sum_example_test(struct kunit *test)
 {
 	KUNIT_EXPECT_EQ(test, 2, 2);
