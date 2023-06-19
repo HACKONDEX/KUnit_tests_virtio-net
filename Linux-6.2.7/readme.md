@@ -2,19 +2,19 @@
 
 # VirtioNet test research
 
-- [Kconfig](/drivers/net/Kconfig)
+- [Kconfig](linux/drivers/net/kconfig)
 
-- [Makefile](/drivers/net/Makefile)
+- [Makefile](linux/drivers/net/Makefile)
 
-- [virtio_net.c](/drivers/net/virtio_net.c)
+- [virtio_net.c](linux/drivers/net/virtio_net.c)
 
-- [virtio_net_test.c](/drivers/net/virtio_net_test.c)
+- [virtio_net_test.c](linux/drivers/net/virtio_net_test.c)
 
-- [virtio_net_test.h](/drivers/net/virtio_net_test.h)
+- [virtio_net_test.h](linux/drivers/net/virtio_net_test.h)
 
 -----------------
 
-- [.kunitconfig](/.kuint/.kunitconfig)
+- [.kunitconfig](linux/.kunit/.kunitconfig)
 
 -----------------
 
